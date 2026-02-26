@@ -242,6 +242,11 @@ button.danger {
   background: var(--danger);
 }
 
+#delete-week-btn {
+  margin: 4px;
+  padding: 10px 16px;
+}
+
 .grid-2,
 .grid-3,
 .grid-ingredient {
