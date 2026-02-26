@@ -139,14 +139,47 @@ function parseCookies(headerValue) {
   return cookies;
 }
 
-function setSessionCookie(res, token) {
-  const secure = process.env.NODE_ENV === 'production';
+function toBooleanEnv(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (!normalized) {
+    return null;
+  }
+
+  if (['1', 'true', 'yes', 'on'].includes(normalized)) {
+    return true;
+  }
+
+  if (['0', 'false', 'no', 'off'].includes(normalized)) {
+    return false;
+  }
+
+  return null;
+}
+
+function shouldUseSecureCookie(req) {
+  const explicit = toBooleanEnv(process.env.SESSION_COOKIE_SECURE);
+  if (explicit !== null) {
+    return explicit;
+  }
+
+  const forwardedProto = String(req.headers['x-forwarded-proto'] || '')
+    .split(',')[0]
+    .trim()
+    .toLowerCase();
+  const isHttps = req.secure || forwardedProto === 'https';
+  return process.env.NODE_ENV === 'production' && isHttps;
+}
+
+function setSessionCookie(req, res, token) {
+  const secure = shouldUseSecureCookie(req);
+  const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
   const parts = [
     `${SESSION_COOKIE_NAME}=${encodeURIComponent(token)}`,
     'Path=/',
     'HttpOnly',
     'SameSite=Lax',
-    `Max-Age=${Math.floor(SESSION_TTL_MS / 1000)}`
+    `Max-Age=${Math.floor(SESSION_TTL_MS / 1000)}`,
+    `Expires=${expiresAt.toUTCString()}`
   ];
 
   if (secure) {
@@ -159,7 +192,7 @@ function setSessionCookie(res, token) {
 function clearSessionCookie(res) {
   res.setHeader(
     'Set-Cookie',
-    `${SESSION_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`
+    `${SESSION_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT`
   );
 }
 
@@ -243,7 +276,7 @@ app.post('/api/auth/register', (req, res) => {
     const createdUser = authDb.createUser(username, password);
     getUserStore(createdUser.id);
     const token = authDb.createSession(createdUser.id, Date.now() + SESSION_TTL_MS);
-    setSessionCookie(res, token);
+    setSessionCookie(req, res, token);
     return res.status(201).json({
       id: createdUser.id,
       username: createdUser.username
@@ -267,7 +300,7 @@ app.post('/api/auth/login', (req, res) => {
   }
 
   const token = authDb.createSession(user.id, Date.now() + SESSION_TTL_MS);
-  setSessionCookie(res, token);
+  setSessionCookie(req, res, token);
   return res.json({
     id: user.id,
     username: user.username
