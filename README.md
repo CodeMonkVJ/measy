@@ -1,4 +1,4 @@
-# [Measy](measy.codemonkapps.me)
+# [Measy](https://measy.codemonkapps.me)
 
 Measy is a full-stack meal prep planner for weekly planning, grocery rollups, and quick ordering links.
 
