@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Measy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="bg-glow" aria-hidden="true"></div>
+    <header class="app-header">
+      <div>
+        <p class="kicker">Meal Prep Made Easy</p>
+        <h1>Measy</h1>
+        <p class="subtitle">Track weekly meal prep, portions, ingredients, and instructions in one place.</p>
+      </div>
+      <div class="app-header-user">
+        <p class="user-identity" id="auth-username">-</p>
+        <button id="logout-btn" class="secondary" type="button">Logout</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="panel">
+        <section class="prep-calendar-card">
+          <div class="prep-calendar-head">
+            <h3>Prep Calendar</h3>
+            <div class="prep-calendar-nav">
+              <button id="calendar-prev-btn" class="secondary" type="button" aria-label="Previous month">&lt;</button>
+              <span id="calendar-month-label" class="prep-calendar-month">Month</span>
+              <button id="calendar-next-btn" class="secondary" type="button" aria-label="Next month">&gt;</button>
+            </div>
+          </div>
+          <div id="prep-calendar" class="prep-calendar-grid"></div>
+          <p id="prep-calendar-note" class="helper">Select a week to view meal prep days.</p>
+        </section>
+
+        <h2>Create New Prep Week</h2>
+        <form id="week-create-form" class="stack-form">
+          <label>
+            Week title
+            <input name="title" placeholder="Week of March 3" required />
+          </label>
+          <label>
+            Start date
+            <input type="date" name="start_date" />
+          </label>
+          <div class="grid-3">
+            <label>
+              Days
+              <input type="number" min="1" name="days_count" value="7" required />
+            </label>
+            <label>
+              Meals to prep
+              <input type="number" min="1" name="meals_to_prep" value="14" required />
+            </label>
+            <label>
+              People
+              <input type="number" min="1" name="people_count" value="1" required />
+            </label>
+          </div>
+          <button type="submit">Create Week</button>
+        </form>
+
+        <ul id="weeks-list" class="weeks-list"></ul>
+      </aside>
+
+      <section class="content">
+        <details class="panel collapsible-card">
+          <summary class="section-head collapsible-summary">
+            <h2>Week Settings</h2>
+            <span class="collapse-hint">Collapse</span>
+          </summary>
+          <div class="collapsible-body">
+            <div class="section-head">
+              <h3>Configure Week</h3>
+              <button id="delete-week-btn" class="danger" type="button">Delete Week</button>
+            </div>
+            <form id="week-edit-form" class="stack-form disabled-block">
+              <label>
+                Week title
+                <input name="title" required />
+              </label>
+              <label>
+                Start date
+                <input type="date" name="start_date" />
+              </label>
+              <div class="grid-3">
+                <label>
+                  Days
+                  <input type="number" min="1" name="days_count" required />
+                </label>
+                <label>
+                  Meals to prep
+                  <input type="number" min="1" name="meals_to_prep" required />
+                </label>
+                <label>
+                  People
+                  <input type="number" min="1" name="people_count" required />
+                </label>
+              </div>
+              <button type="submit">Update Week</button>
+            </form>
+            <form id="week-clone-form" class="stack-form disabled-block compact">
+              <h3>Repeat This Week</h3>
+              <label>
+                New start date
+                <input type="date" name="start_date" required />
+              </label>
+              <label>
+                New week title (optional)
+                <input name="title" placeholder="Leave blank to auto-name" />
+              </label>
+              <button type="submit">Clone Week</button>
+            </form>
+          </div>
+        </details>
+
+        <article class="panel">
+          <div class="section-head">
+            <h2>Meals</h2>
+            <div class="meals-head-right">
+              <span id="meals-progress" class="meals-progress-badge" title="Planned servings / weekly target">0/0</span>
+              <button id="open-create-meal-btn" type="button">+ Add Meal</button>
+            </div>
+          </div>
+          <ul id="meals-list" class="meal-list"></ul>
+        </article>
+
+        <article class="panel">
+          <h2>Grocery Rollup</h2>
+          <p class="helper">Totals are calculated as: ingredient quantity per serving x planned servings x number of people</p>
+          <ul id="grocery-list" class="list"></ul>
+        </article>
+      </section>
+    </main>
+
+    <div id="meal-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="meal-modal-title">
+      <div class="modal-card panel">
+        <div class="modal-head">
+          <h2 id="meal-modal-title">Edit Meal</h2>
+          <div class="modal-head-actions">
+            <button id="modal-delete-meal-btn" class="danger" type="button">Delete</button>
+            <button id="close-meal-modal-btn" class="secondary" type="button">Close</button>
+          </div>
+        </div>
+
+        <form id="meal-edit-form" class="stack-form">
+          <label>
+            Meal name
+            <input name="name" required />
+          </label>
+          <label>
+            Planned servings
+            <input type="number" min="1" step="1" name="planned_servings" value="1" required />
+          </label>
+          <p id="planned-servings-status" class="helper field-note"></p>
+          <label>
+            Notes
+            <textarea name="notes" rows="2" placeholder="Optional prep notes"></textarea>
+          </label>
+          <button type="submit">Save Meal</button>
+        </form>
+
+        <section id="ingredients-section" class="modal-section">
+          <h3 class="section-title-with-tip">
+            Ingredients
+            <span class="info-tooltip" tabindex="0" aria-label="Ingredient quantity guidance">
+              i
+              <span class="info-tooltip-text">Please enter quantity/weight data per meal and per person only.</span>
+            </span>
+          </h3>
+          <div class="paste-ingredients-box compact">
+            <label>
+              Paste ingredient list
+              <textarea
+                id="ingredient-paste-input"
+                rows="6"
+                placeholder="Example:&#10;- 2 cups rice&#10;- 1/2 tbsp olive oil&#10;- Salt to taste"
+              ></textarea>
+            </label>
+            <div class="paste-actions">
+              <button id="parse-ingredients-btn" type="button">Parse List</button>
+              <button id="add-parsed-ingredients-btn" type="button" class="secondary">Add Parsed Items</button>
+            </div>
+            <p id="ingredient-parse-status" class="helper"></p>
+            <ul id="parsed-ingredients-list" class="list modal-list"></ul>
+          </div>
+          <form id="ingredient-form" class="stack-form compact">
+            <div class="grid-ingredient">
+              <label>
+                Component
+                <select name="component_type">
+                  <option value="proteins">proteins</option>
+                  <option value="veggies">veggies</option>
+                  <option value="carbs">carbs</option>
+                  <option value="sauces">sauces</option>
+                  <option value="other">other</option>
+                </select>
+              </label>
+              <label>
+                Item
+                <input name="item_name" required />
+              </label>
+              <label>
+                Qty/serving
+                <input type="number" min="0" step="0.1" name="quantity" value="0" required />
+              </label>
+              <label>
+                Unit
+                <input name="unit" placeholder="g, oz, cup" />
+              </label>
+            </div>
+            <button type="submit">Add Ingredient</button>
+          </form>
+          <ul id="ingredients-list" class="list modal-list"></ul>
+        </section>
+
+        <section id="instructions-section" class="modal-section">
+          <h3>Instructions</h3>
+          <form id="instruction-form" class="stack-form compact">
+            <label>
+              Full instructions
+              <textarea
+                name="body"
+                rows="8"
+                placeholder="Write the complete prep/cook instructions for this meal..."
+              ></textarea>
+            </label>
+            <button type="submit">Save Instructions</button>
+          </form>
+          <p id="instructions-status" class="helper"></p>
+        </section>
+      </div>
+    </div>
+
+    <div id="meal-view-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="meal-view-title">
+      <div class="modal-card modal-card-view panel">
+        <div class="modal-head">
+          <h2 id="meal-view-title">Meal View</h2>
+          <div class="modal-head-actions">
+            <button id="close-meal-view-modal-btn" class="secondary" type="button">Close</button>
+          </div>
+        </div>
+
+        <div class="view-top-grid">
+          <div class="view-tile">
+            <p class="kicker">Planned Servings</p>
+            <div class="view-value-row">
+              <p id="meal-view-servings" class="view-value">0</p>
+              <span id="meal-view-people-badge" class="view-people-badge hidden" aria-label="People count"></span>
+            </div>
+          </div>
+          <div class="view-tile">
+            <p class="kicker">Meal Name</p>
+            <p id="meal-view-name" class="view-value">-</p>
+          </div>
+        </div>
+
+        <section class="modal-section">
+          <h3>Instructions</h3>
+          <pre id="meal-view-instructions" class="view-instructions">No instructions yet.</pre>
+        </section>
+
+        <section class="modal-section">
+          <h3>Ingredients</h3>
+          <ul id="meal-view-ingredients-list" class="list modal-list view-list"></ul>
+        </section>
+
+        <section class="modal-section">
+          <h3>Notes</h3>
+          <p id="meal-view-notes" class="view-text">No notes yet.</p>
+        </section>
+      </div>
+    </div>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>

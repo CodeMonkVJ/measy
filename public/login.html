@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Measy Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="bg-glow" aria-hidden="true"></div>
+    <main class="auth-shell">
+      <section class="auth-hero panel">
+        <p class="kicker">Meal Prep Made Easy</p>
+        <h1>Measy</h1>
+        <p class="subtitle">Sign in to continue planning your weeks, meals, and grocery rollups.</p>
+      </section>
+
+      <section class="auth-grid">
+        <article class="panel auth-card">
+          <h2>Login</h2>
+          <form id="login-form" class="stack-form">
+            <label>
+              Username
+              <input name="username" type="text" autocomplete="username" required />
+            </label>
+            <label>
+              Password
+              <input name="password" type="password" autocomplete="current-password" minlength="8" required />
+            </label>
+            <button type="submit">Login</button>
+          </form>
+        </article>
+
+        <article class="panel auth-card">
+          <h2>Create Account</h2>
+          <form id="register-form" class="stack-form">
+            <label>
+              Username
+              <input name="username" type="text" autocomplete="username" required />
+            </label>
+            <label>
+              Password
+              <input name="password" type="password" autocomplete="new-password" minlength="8" required />
+            </label>
+            <button type="submit">Create Account</button>
+          </form>
+        </article>
+      </section>
+
+      <p id="auth-status" class="auth-status" aria-live="polite"></p>
+    </main>
+
+    <script src="/auth.js" defer></script>
+  </body>
+</html>

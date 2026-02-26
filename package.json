@@ -1,0 +1,20 @@
+{
+  "name": "measy",
+  "version": "0.1.0",
+  "description": "Meal prep planning app with vanilla JS and SQLite",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "meal-prep",
+    "sqlite",
+    "vanilla-js"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "express": "^4.21.2"
+  }
+}
