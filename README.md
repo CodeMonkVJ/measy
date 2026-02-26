@@ -1,4 +1,4 @@
-# Measy
+# [Measy](measy.codemonkapps.me)
 
 Measy is a full-stack meal prep planner for weekly planning, grocery rollups, and quick ordering links.
 
@@ -65,7 +65,7 @@ docker build -t measy:latest .
 
 2. Run the container:
 ```bash
-docker run --name measy -p 3433:3433 -v "$(pwd)/data:/app/data" measy:latest
+docker run -d --name measy -p 3433:3433 -v "$(pwd)/data:/app/data" measy:latest
 ```
 
 3. Open:
@@ -75,7 +75,19 @@ http://localhost:3433
 
 Notes:
 - The volume mount `-v "$(pwd)/data:/app/data"` keeps SQLite data persistent on your host.
+- Check running container:
+```bash
+docker ps
+```
+- View logs:
+```bash
+docker logs -f measy
+```
 - Stop container:
 ```bash
 docker stop measy
+```
+- Remove container:
+```bash
+docker rm -f measy
 ```
