@@ -65,12 +65,12 @@ docker build -t measy:latest .
 
 2. Run the container:
 ```bash
-docker run --name measy -p 3431:3431 -v "$(pwd)/data:/app/data" measy:latest
+docker run --name measy -p 3433:3433 -v "$(pwd)/data:/app/data" measy:latest
 ```
 
 3. Open:
 ```text
-http://localhost:3000
+http://localhost:3433
 ```
 
 Notes:
