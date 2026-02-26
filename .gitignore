@@ -2,4 +2,3 @@ node_modules/
 data/*.db
 data/accounts/*.db
 .DS_Store
-package-lock.json
