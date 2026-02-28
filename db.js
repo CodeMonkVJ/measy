@@ -180,15 +180,17 @@ function createStatements(db) {
 
     groceryRollupByWeek: db.prepare(`
       SELECT
-        i.item_name,
-        COALESCE(i.unit, '') AS unit,
+        MIN(TRIM(i.item_name)) AS item_name,
+        MIN(TRIM(COALESCE(i.unit, ''))) AS unit,
         ROUND(SUM(i.quantity * m.planned_servings * COALESCE(w.people_count, 1)), 2) AS total_quantity
       FROM ingredients i
       JOIN meals m ON m.id = i.meal_id
       JOIN weeks w ON w.id = m.week_id
       WHERE m.week_id = ?
-      GROUP BY i.item_name, i.unit
-      ORDER BY i.item_name COLLATE NOCASE ASC
+      GROUP BY
+        LOWER(TRIM(i.item_name)),
+        LOWER(TRIM(COALESCE(i.unit, '')))
+      ORDER BY MIN(TRIM(i.item_name)) COLLATE NOCASE ASC
     `),
     listOrderedGroceryKeysByWeek: db.prepare(`
       SELECT item_key

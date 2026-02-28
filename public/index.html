@@ -58,7 +58,7 @@
               <input type="number" min="1" name="days_count" value="7" required />
             </label>
             <label>
-              Meals to prep
+              Servings to prep
               <input type="number" min="1" name="meals_to_prep" value="14" required />
             </label>
             <label>
@@ -98,7 +98,7 @@
                   <input type="number" min="1" name="days_count" required />
                 </label>
                 <label>
-                  Meals to prep
+                  Servings to prep
                   <input type="number" min="1" name="meals_to_prep" required />
                 </label>
                 <label>
@@ -127,7 +127,7 @@
           <div class="section-head">
             <h2>Meals</h2>
             <div class="meals-head-right">
-              <span id="meals-progress" class="meals-progress-badge" title="Planned servings / weekly target">0/0</span>
+              <span id="meals-progress" class="meals-progress-badge" title="Planned servings / weekly servings target">0/0</span>
               <button id="open-create-meal-btn" type="button">+ Add Meal</button>
             </div>
           </div>
@@ -177,49 +177,82 @@
               <span class="info-tooltip-text">Please enter quantity/weight data per meal and per person only.</span>
             </span>
           </h3>
-          <div class="paste-ingredients-box compact">
-            <label>
-              Paste ingredient list
-              <textarea
-                id="ingredient-paste-input"
-                rows="6"
-                placeholder="Example:&#10;- 2 cups rice&#10;- 1/2 tbsp olive oil&#10;- Salt to taste"
-              ></textarea>
-            </label>
-            <div class="paste-actions">
-              <button id="parse-ingredients-btn" type="button">Parse List</button>
-              <button id="add-parsed-ingredients-btn" type="button" class="secondary">Add Parsed Items</button>
-            </div>
-            <p id="ingredient-parse-status" class="helper"></p>
-            <ul id="parsed-ingredients-list" class="list modal-list"></ul>
+          <div class="ingredient-entry-tabs compact" role="tablist" aria-label="Ingredient add mode">
+            <button
+              id="ingredient-tab-paste"
+              class="ingredient-entry-tab is-active"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              aria-controls="ingredient-entry-paste-panel"
+              data-entry-mode="paste"
+            >
+              Paste &amp; Parse
+            </button>
+            <button
+              id="ingredient-tab-manual"
+              class="ingredient-entry-tab"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="ingredient-entry-manual-panel"
+              data-entry-mode="manual"
+            >
+              Manual Add
+            </button>
           </div>
-          <form id="ingredient-form" class="stack-form compact">
-            <div class="grid-ingredient">
+          <div id="ingredient-entry-paste-panel" class="ingredient-entry-panel" role="tabpanel" aria-labelledby="ingredient-tab-paste">
+            <div class="paste-ingredients-box">
               <label>
-                Component
-                <select name="component_type">
-                  <option value="proteins">proteins</option>
-                  <option value="veggies">veggies</option>
-                  <option value="carbs">carbs</option>
-                  <option value="sauces">sauces</option>
-                  <option value="other">other</option>
-                </select>
+                Paste ingredient list
+                <textarea
+                  id="ingredient-paste-input"
+                  rows="6"
+                  placeholder="Example:&#10;- 2 cups rice&#10;- 1/2 tbsp olive oil&#10;- Salt to taste"
+                ></textarea>
               </label>
-              <label>
-                Item
-                <input name="item_name" required />
-              </label>
-              <label>
-                Qty/serving
-                <input type="number" min="0" step="0.1" name="quantity" value="0" required />
-              </label>
-              <label>
-                Unit
-                <input name="unit" placeholder="g, oz, cup" />
-              </label>
+              <div class="paste-actions">
+                <button id="parse-ingredients-btn" type="button">Parse List</button>
+                <button id="add-parsed-ingredients-btn" type="button" class="secondary">Add Parsed Items</button>
+              </div>
+              <p id="ingredient-parse-status" class="helper"></p>
+              <ul id="parsed-ingredients-list" class="list modal-list"></ul>
             </div>
-            <button type="submit">Add Ingredient</button>
-          </form>
+          </div>
+          <div
+            id="ingredient-entry-manual-panel"
+            class="ingredient-entry-panel hidden"
+            role="tabpanel"
+            aria-labelledby="ingredient-tab-manual"
+          >
+            <form id="ingredient-form" class="stack-form">
+              <div class="grid-ingredient">
+                <label>
+                  Component
+                  <select name="component_type">
+                    <option value="proteins">proteins</option>
+                    <option value="veggies">veggies</option>
+                    <option value="carbs">carbs</option>
+                    <option value="sauces">sauces</option>
+                    <option value="other">other</option>
+                  </select>
+                </label>
+                <label>
+                  Item
+                  <input name="item_name" required />
+                </label>
+                <label>
+                  Qty/serving
+                  <input type="number" min="0" step="0.1" name="quantity" value="0" required />
+                </label>
+                <label>
+                  Unit
+                  <input name="unit" placeholder="g, oz, cup" />
+                </label>
+              </div>
+              <button type="submit">Add Ingredient</button>
+            </form>
+          </div>
           <ul id="ingredients-list" class="list modal-list"></ul>
         </section>
 

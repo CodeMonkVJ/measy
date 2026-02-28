@@ -569,21 +569,21 @@ app.post('/api/weeks/:weekId/meals', (req, res) => {
   }
 
   const plannedServings = Math.max(1, toInt(req.body?.planned_servings, 1));
-  const targetMeals = Math.max(0, toInt(week.meals_to_prep, 0));
+  const targetServings = Math.max(0, toInt(week.meals_to_prep, 0));
   const currentPlannedServings = statements
     .listMealsByWeek
     .all(weekId)
     .reduce((sum, meal) => sum + Number(meal.planned_servings || 0), 0);
 
-  if (targetMeals > 0 && currentPlannedServings >= targetMeals) {
+  if (targetServings > 0 && currentPlannedServings >= targetServings) {
     return res.status(400).json({
-      error: `Weekly target already reached (${currentPlannedServings}/${targetMeals}). Edit existing meals to adjust.`
+      error: `Weekly servings target already reached (${currentPlannedServings}/${targetServings}). Edit existing meals to adjust.`
     });
   }
 
-  if (targetMeals > 0 && currentPlannedServings + plannedServings > targetMeals) {
+  if (targetServings > 0 && currentPlannedServings + plannedServings > targetServings) {
     return res.status(400).json({
-      error: `Adding this meal exceeds weekly target (${currentPlannedServings + plannedServings}/${targetMeals}).`
+      error: `Adding this meal exceeds weekly servings target (${currentPlannedServings + plannedServings}/${targetServings}).`
     });
   }
 
@@ -623,7 +623,7 @@ app.put('/api/meals/:mealId', (req, res) => {
 
   const plannedServings = Math.max(1, toInt(req.body?.planned_servings, existing.planned_servings));
   const week = statements.getWeek.get(existing.week_id);
-  const targetMeals = Math.max(0, toInt(week?.meals_to_prep, 0));
+  const targetServings = Math.max(0, toInt(week?.meals_to_prep, 0));
   const otherPlannedServings = statements
     .listMealsByWeek
     .all(existing.week_id)
@@ -634,9 +634,9 @@ app.put('/api/meals/:mealId', (req, res) => {
       return sum + Number(meal.planned_servings || 0);
     }, 0);
 
-  if (targetMeals > 0 && otherPlannedServings + plannedServings > targetMeals) {
+  if (targetServings > 0 && otherPlannedServings + plannedServings > targetServings) {
     return res.status(400).json({
-      error: `Updated meal exceeds weekly target (${otherPlannedServings + plannedServings}/${targetMeals}).`
+      error: `Updated meal exceeds weekly servings target (${otherPlannedServings + plannedServings}/${targetServings}).`
     });
   }
 

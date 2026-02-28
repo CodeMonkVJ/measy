@@ -521,6 +521,44 @@ button.danger {
   color: var(--danger);
 }
 
+.ingredient-entry-tabs {
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f3f0e4;
+}
+
+.ingredient-entry-tab {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1;
+  padding: 8px 12px;
+}
+
+.ingredient-entry-tab:hover {
+  filter: none;
+}
+
+.ingredient-entry-tab.is-active {
+  border-color: #d4cdb5;
+  background: #fff;
+  color: var(--ink);
+}
+
+.ingredient-entry-tab:not(.is-active):hover {
+  background: #ede8d8;
+}
+
+.ingredient-entry-panel {
+  margin-top: 10px;
+}
+
 .paste-ingredients-box {
   border: 1px dashed var(--line);
   border-radius: 12px;

@@ -13,7 +13,8 @@ const state = {
     mealId: null,
     ingredients: [],
     instructions: [],
-    parsedIngredients: []
+    parsedIngredients: [],
+    ingredientEntryMode: 'paste'
   }
 };
 
@@ -54,6 +55,10 @@ const mealViewIngredientsListEl = document.getElementById('meal-view-ingredients
 const mealViewInstructionsEl = document.getElementById('meal-view-instructions');
 
 const ingredientsSectionEl = document.getElementById('ingredients-section');
+const ingredientTabPasteBtn = document.getElementById('ingredient-tab-paste');
+const ingredientTabManualBtn = document.getElementById('ingredient-tab-manual');
+const ingredientEntryPastePanelEl = document.getElementById('ingredient-entry-paste-panel');
+const ingredientEntryManualPanelEl = document.getElementById('ingredient-entry-manual-panel');
 const ingredientPasteInputEl = document.getElementById('ingredient-paste-input');
 const parseIngredientsBtn = document.getElementById('parse-ingredients-btn');
 const addParsedIngredientsBtn = document.getElementById('add-parsed-ingredients-btn');
@@ -706,7 +711,7 @@ function renderWeeks() {
         <span class="week-color-dot" aria-hidden="true"></span>
         <strong>${escapeHtml(week.title)}</strong>
       </div>
-      <div class="week-meta">${week.start_date || 'No start date'} | ${week.days_count} days | ${week.meals_to_prep} target meals | ${peopleCount} people</div>
+      <div class="week-meta">${week.start_date || 'No start date'} | ${week.days_count} days | ${week.meals_to_prep} target servings | ${peopleCount} people</div>
       <div class="week-meta">${week.meal_count || 0} meals | ${week.total_planned_servings || 0} planned servings</div>
     `;
 
@@ -925,7 +930,7 @@ function validatePlannedServingsField() {
   if (isValid) {
     input.setCustomValidity('');
     if (capped) {
-      plannedServingsStatusEl.textContent = `Allowed: up to ${maxAllowed} serving(s) for this week target.`;
+      plannedServingsStatusEl.textContent = `Allowed: up to ${maxAllowed} serving(s) for this week's target servings.`;
     } else {
       plannedServingsStatusEl.textContent = '';
     }
@@ -954,7 +959,7 @@ function renderMealsProgress() {
 
   openCreateMealBtn.disabled = isComplete;
   openCreateMealBtn.title = isComplete
-    ? `Weekly target reached (${totalPlanned}/${target}). Edit existing meals to adjust.`
+    ? `Weekly servings target reached (${totalPlanned}/${target}). Edit existing meals to adjust.`
     : `You can plan ${remaining} more serving(s).`;
 }
 
@@ -1093,6 +1098,23 @@ function componentTypeOptions(selectedValue) {
 function setModalIngredientInstructionEnabled(enabled) {
   ingredientsSectionEl.classList.toggle('disabled-block', !enabled);
   instructionsSectionEl.classList.toggle('disabled-block', !enabled);
+}
+
+function setIngredientEntryMode(mode) {
+  const nextMode = mode === 'manual' ? 'manual' : 'paste';
+  const isPasteMode = nextMode === 'paste';
+  state.modal.ingredientEntryMode = nextMode;
+
+  ingredientEntryPastePanelEl.classList.toggle('hidden', !isPasteMode);
+  ingredientEntryManualPanelEl.classList.toggle('hidden', isPasteMode);
+  ingredientEntryPastePanelEl.setAttribute('aria-hidden', isPasteMode ? 'false' : 'true');
+  ingredientEntryManualPanelEl.setAttribute('aria-hidden', isPasteMode ? 'true' : 'false');
+  ingredientTabPasteBtn.classList.toggle('is-active', isPasteMode);
+  ingredientTabManualBtn.classList.toggle('is-active', !isPasteMode);
+  ingredientTabPasteBtn.setAttribute('aria-selected', isPasteMode ? 'true' : 'false');
+  ingredientTabManualBtn.setAttribute('aria-selected', isPasteMode ? 'false' : 'true');
+  ingredientTabPasteBtn.tabIndex = isPasteMode ? 0 : -1;
+  ingredientTabManualBtn.tabIndex = isPasteMode ? -1 : 0;
 }
 
 function fillMealForm(meal) {
@@ -1310,7 +1332,7 @@ function openCreateMealModal() {
   }
 
   if (isComplete) {
-    alert(`Weekly target reached (${totalPlanned}/${target}). Edit existing meals to adjust.`);
+    alert(`Weekly servings target reached (${totalPlanned}/${target}). Edit existing meals to adjust.`);
     return;
   }
 
@@ -1329,6 +1351,7 @@ function openCreateMealModal() {
   ingredientParseStatusEl.textContent = '';
   ingredientForm.elements.component_type.value = 'veggies';
   ingredientForm.elements.quantity.value = 0;
+  setIngredientEntryMode(state.modal.ingredientEntryMode);
   setModalIngredientInstructionEnabled(false);
   renderModalIngredients();
   renderParsedIngredients();
@@ -1377,6 +1400,7 @@ async function openEditMealModal(mealId) {
   ingredientParseStatusEl.textContent = '';
   ingredientForm.elements.component_type.value = 'veggies';
   ingredientForm.elements.quantity.value = 0;
+  setIngredientEntryMode(state.modal.ingredientEntryMode);
   setModalIngredientInstructionEnabled(true);
   renderParsedIngredients();
   validatePlannedServingsField();
@@ -1635,7 +1659,7 @@ mealEditForm.addEventListener('submit', async (event) => {
 
       const requestedServings = Math.max(1, Number(payload.planned_servings || 1));
       if (target > 0 && totalPlanned + requestedServings > target) {
-        alert(`This would exceed weekly target (${totalPlanned + requestedServings}/${target}).`);
+        alert(`This would exceed weekly servings target (${totalPlanned + requestedServings}/${target}).`);
         return;
       }
 
@@ -1776,6 +1800,33 @@ parseIngredientsBtn.addEventListener('click', () => {
 
   renderParsedIngredients();
 });
+
+ingredientTabPasteBtn.addEventListener('click', () => {
+  setIngredientEntryMode('paste');
+});
+
+ingredientTabManualBtn.addEventListener('click', () => {
+  setIngredientEntryMode('manual');
+});
+
+function handleIngredientTabArrowNav(event) {
+  if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') {
+    return;
+  }
+
+  event.preventDefault();
+  if (state.modal.ingredientEntryMode === 'paste') {
+    setIngredientEntryMode('manual');
+    ingredientTabManualBtn.focus();
+    return;
+  }
+
+  setIngredientEntryMode('paste');
+  ingredientTabPasteBtn.focus();
+}
+
+ingredientTabPasteBtn.addEventListener('keydown', handleIngredientTabArrowNav);
+ingredientTabManualBtn.addEventListener('keydown', handleIngredientTabArrowNav);
 
 parsedIngredientsListEl.addEventListener('input', (event) => {
   const row = event.target.closest('li[data-parsed-index]');
@@ -1946,6 +1997,7 @@ logoutBtn.addEventListener('click', async () => {
 (async function init() {
   try {
     setWeekFormsEnabled(false);
+    setIngredientEntryMode(state.modal.ingredientEntryMode);
     await loadAuthUser();
     await refreshWeeks();
   } catch (error) {
